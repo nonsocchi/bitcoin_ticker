@@ -11,9 +11,8 @@ class PriceScreen extends StatefulWidget {
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = 'USD';
 
-  List<DropdownMenuItem<String>> getDropDownItems() {
+  DropdownButton<String> getDropDownItems() {
     List<DropdownMenuItem<String>> dropdownItems = [];
-
     for (String currency in currenciesList) {
       var newItem = DropdownMenuItem(
         child: Text(currency),
@@ -21,7 +20,16 @@ class _PriceScreenState extends State<PriceScreen> {
       );
       dropdownItems.add(newItem);
     }
-    return dropdownItems;
+    return DropdownButton<String>(
+      value: selectedCurrency,
+      elevation: 16,
+      onChanged: (String? value) {
+        setState(() {
+          selectedCurrency = value!;
+        });
+      },
+      items: dropdownItems,
+    );
   }
 
   @override
@@ -61,16 +69,7 @@ class _PriceScreenState extends State<PriceScreen> {
             alignment: Alignment.center,
             padding: const EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
-            child: DropdownButton<String>(
-              value: selectedCurrency,
-              elevation: 16,
-              onChanged: (String? value) {
-                setState(() {
-                  selectedCurrency = value!;
-                });
-              },
-              items: getDropDownItems(),
-            ),
+            child: getDropDownItems(),
           ),
         ],
       ),
