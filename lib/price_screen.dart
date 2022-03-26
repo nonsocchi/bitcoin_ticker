@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'coin_data.dart';
+import 'coin_card.dart';
 
 class PriceScreen extends StatefulWidget {
   const PriceScreen({Key? key}) : super(key: key);
@@ -9,8 +10,9 @@ class PriceScreen extends StatefulWidget {
 }
 
 class _PriceScreenState extends State<PriceScreen> {
-  String selectedCurrency = 'AUD';
-  String bitcoinValue = '';
+  String _selectedCurrency = 'AUD';
+  Map<String, String> coinPrices = {};
+  bool isWaiting = false;
 
   DropdownButton<String> getDropDownItems() {
     List<DropdownMenuItem<String>> dropdownItems = [];
@@ -23,11 +25,11 @@ class _PriceScreenState extends State<PriceScreen> {
     }
     return DropdownButton<String>(
       isExpanded: true,
-      value: selectedCurrency,
+      value: _selectedCurrency,
       elevation: 16,
       onChanged: (String? value) {
         setState(() {
-          selectedCurrency = value!;
+          _selectedCurrency = value!;
           getData();
         });
       },
@@ -36,10 +38,12 @@ class _PriceScreenState extends State<PriceScreen> {
   }
 
   void getData() async {
+    isWaiting = true;
     try {
-      double data = await CoinData().getCoinData(selectedCurrency);
+      var data = await CoinData().getCoinData(_selectedCurrency);
+      isWaiting = false;
       setState(() {
-        bitcoinValue = data.toStringAsFixed(0);
+        coinPrices = data;
       });
     } catch (e) {
       print(e);
@@ -61,28 +65,19 @@ class _PriceScreenState extends State<PriceScreen> {
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Card(
-              color: Colors.lightBlueAccent,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 15.0, horizontal: 28.0),
-                child: Text(
-                  '1 BTC = $bitcoinValue $selectedCurrency',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (String coin in cryptoList)
+                  CoinCard(
+                    selectedCoin: coin,
+                    selectedCurrency: _selectedCurrency,
+                    coinValue: isWaiting ? '?' : coinPrices[coin]!,
                   ),
-                ),
-              ),
+              ],
             ),
           ),
           Container(
