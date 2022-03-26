@@ -75,7 +75,7 @@ class _PriceScreenState extends State<PriceScreen> {
                   CoinCard(
                     selectedCoin: coin,
                     selectedCurrency: _selectedCurrency,
-                    coinValue: isWaiting ? '?' : coinPrices[coin]!,
+                    coinValue: isWaiting ? '...' : coinPrices[coin] as String,
                   ),
               ],
             ),
